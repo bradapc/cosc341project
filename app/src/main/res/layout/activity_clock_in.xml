@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:padding="24dp"
     android:background="#FFFFFF"
-    tools:context=".MainActivity"
+    tools:context=".ClockInActivity"
     tools:ignore="HardcodedText">
 
     <TextView
@@ -25,64 +25,61 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="#000000"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="32dp"/>
 
     <TextView
-        android:id="@+id/greetingText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Good Morning, Fahar"
+        android:text="Are you ready to Clock in?"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#000000"
-        android:layout_marginBottom="32dp" />
+        android:layout_marginBottom="24dp" />
 
     <TextView
+        android:id="@+id/timeText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Your Schedule for today:"
+        android:text="Time: --:-- --"
         android:textSize="18sp"
         android:textColor="#000000"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="12dp"
+        android:textStyle="bold"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Shift: 10:00am - 4:00pm"
-        android:textSize="16sp"
-        android:textColor="#333333"
-        android:layout_marginBottom="8dp"/>
+        android:text="Worker: Fahar Murray"
+        android:textSize="18sp"
+        android:textColor="#000000"
+        android:layout_marginBottom="12dp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Zone: Apple Orchard - Row B"
-        android:textSize="16sp"
-        android:textColor="#333333"
+        android:textSize="18sp"
+        android:textColor="#000000"
         android:layout_marginBottom="48dp"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#CCCCCC"
-        android:layout_marginBottom="24dp"/>
-
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Status: Not clocked in"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:layout_marginBottom="32dp"/>
-
     <Button
-        android:id="@+id/clockInButton"
+        android:id="@+id/confirmClockInButton"
         android:layout_width="match_parent"
         android:layout_height="90dp"
         android:text="Clock In"
-        android:textSize="28sp"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:backgroundTint="#E0E0E0"
+        android:textColor="#000000"
+        app:cornerRadius="12dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:text="Cancel"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:backgroundTint="#E0E0E0"
         android:textColor="#000000"
