@@ -77,7 +77,8 @@ public class ClockInActivity extends AppCompatActivity {
         if (mAuth.getCurrentUser() == null) return;
 
         String userId = mAuth.getCurrentUser().getUid();
-        Shift newShift = new Shift(userId, Timestamp.now());
+        // Updated to match the Shift constructor (userId, startTime, zone)
+        Shift newShift = new Shift(userId, Timestamp.now(), "Apple Orchard - Row B");
 
         db.collection("shifts")
             .add(newShift)

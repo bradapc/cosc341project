@@ -7,12 +7,14 @@ public class Shift {
     private Timestamp startTime;
     private Timestamp endTime;
     private boolean active;
+    private String zone;
 
     public Shift() {} // Required for Firestore
 
-    public Shift(String userId, Timestamp startTime) {
+    public Shift(String userId, Timestamp startTime, String zone) {
         this.userId = userId;
         this.startTime = startTime;
+        this.zone = zone;
         this.active = true;
     }
 
@@ -27,4 +29,7 @@ public class Shift {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public String getZone() { return zone; }
+    public void setZone(String zone) { this.zone = zone; }
 }

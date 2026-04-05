@@ -31,6 +31,7 @@
         <activity android:name=".DashboardActivity" android:exported="false" />
         <activity android:name=".ReviewActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".ShiftDetailsActivity" android:exported="false" />
     </application>
 
 </manifest>
