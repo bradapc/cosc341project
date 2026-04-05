@@ -25,11 +25,14 @@
             android:layout_marginTop="32dp"
             android:layout_marginBottom="32dp"/>
 
+        <!-- Main Logging UI -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/harvestLoggingCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp">
+            app:cardElevation="2dp"
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -120,6 +123,59 @@
                     android:backgroundTint="@color/primary_green"
                     android:textColor="@color/white"
                     app:cornerRadius="12dp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- No Active Shift Message (Hidden by default) -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/noShiftCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="32dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🕒"
+                    android:textSize="48sp"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Clock In Required"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_main"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="You must be clocked in to log harvest logs."
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp"/>
+
+                <Button
+                    android:id="@+id/navClockInButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="Go to Work Tab"
+                    android:backgroundTint="@color/primary_green"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp"/>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
