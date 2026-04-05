@@ -29,12 +29,22 @@ public class ReviewDetailActivity extends AppCompatActivity {
 
     private TextView headerWorkerName, detailClockIn, detailClockOut, detailTotalTime;
     private TextView harvestBreakdownText, averageRateText;
+    private TextView reviewEstimatedEarnings, reviewEarningsBreakdown;
     private String shiftId, workerId, workerName;
     private FirebaseFirestore db;
     private int currentTotalBins = 0;
     private long totalDurationMillis = 0;
     private Map<String, Integer> currentBreakdown = new HashMap<>();
     private Timestamp shiftStartTimestamp, shiftEndTimestamp;
+    private double hourlyRate = 19.0;
+
+    private final Map<String, Double> binRates = new HashMap<String, Double>() {{
+        put("Apples", 3.50);
+        put("Pears", 4.00);
+        put("Cherries", 7.00);
+        put("Peaches", 5.50);
+        put("Plums", 4.50);
+    }};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +62,9 @@ public class ReviewDetailActivity extends AppCompatActivity {
         detailTotalTime = findViewById(R.id.detailTotalTime);
         harvestBreakdownText = findViewById(R.id.harvestBreakdownText);
         averageRateText = findViewById(R.id.averageRateText);
+        
+        reviewEstimatedEarnings = findViewById(R.id.reviewEstimatedEarnings);
+        reviewEarningsBreakdown = findViewById(R.id.reviewEarningsBreakdown);
 
         headerWorkerName.setText(workerName);
 
@@ -59,7 +72,18 @@ public class ReviewDetailActivity extends AppCompatActivity {
         findViewById(R.id.approveButton).setOnClickListener(v -> approveShift());
         findViewById(R.id.editLogButton).setOnClickListener(v -> showDetailedEditDialog());
 
+        loadWorkerData();
         loadShiftData();
+    }
+
+    private void loadWorkerData() {
+        db.collection("users").document(workerId).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        Double rate = doc.getDouble("hourlyRate");
+                        if (rate != null) hourlyRate = rate;
+                    }
+                });
     }
 
     private void loadShiftData() {
@@ -90,6 +114,8 @@ public class ReviewDetailActivity extends AppCompatActivity {
                 .addOnSuccessListener(logs -> {
                     currentBreakdown.clear();
                     currentTotalBins = 0;
+                    double totalBinPay = 0;
+                    
                     for (QueryDocumentSnapshot doc : logs) {
                         String crop = doc.getString("cropType");
                         Long bins = doc.getLong("binCount");
@@ -97,6 +123,7 @@ public class ReviewDetailActivity extends AppCompatActivity {
                             int count = bins.intValue();
                             currentTotalBins += count;
                             currentBreakdown.put(crop, currentBreakdown.getOrDefault(crop, 0) + count);
+                            totalBinPay += count * binRates.getOrDefault(crop, 3.0);
                         }
                     }
 
@@ -106,16 +133,22 @@ public class ReviewDetailActivity extends AppCompatActivity {
                     }
                     harvestBreakdownText.setText(sb.length() > 0 ? sb.toString().trim() : "No bins logged.");
 
-                    updateRateUI();
+                    updateRateAndEarningsUI(totalBinPay);
                 });
     }
 
     @SuppressLint("DefaultLocale")
-    private void updateRateUI() {
+    private void updateRateAndEarningsUI(double totalBinPay) {
         if (totalDurationMillis > 0) {
             double hours = totalDurationMillis / (1000.0 * 60.0 * 60.0);
             double rate = currentTotalBins / hours;
             averageRateText.setText(String.format("Average Rate: %.1f Bins/hr", rate));
+            
+            double hourlyPay = hours * hourlyRate;
+            double totalPay = hourlyPay + totalBinPay;
+            
+            reviewEstimatedEarnings.setText(String.format("$%.2f", totalPay));
+            reviewEarningsBreakdown.setText(String.format("Hourly: $%.2f | Bins: $%.2f", hourlyPay, totalBinPay));
         }
     }
 
@@ -138,7 +171,6 @@ public class ReviewDetailActivity extends AppCompatActivity {
         EditText editNotes = dialogView.findViewById(R.id.editNotes);
         LinearLayout fruitContainer = dialogView.findViewById(R.id.fruitBinsContainer);
 
-        // Make time fields non-editable via keyboard
         editClockIn.setFocusable(false);
         editClockOut.setFocusable(false);
 
@@ -146,7 +178,6 @@ public class ReviewDetailActivity extends AppCompatActivity {
         if (shiftStartTimestamp != null) editClockIn.setText(timeFormat.format(shiftStartTimestamp.toDate()));
         if (shiftEndTimestamp != null) editClockOut.setText(timeFormat.format(shiftEndTimestamp.toDate()));
 
-        // Set up Clock Pickers
         editClockIn.setOnClickListener(v -> showTimePicker(editClockIn));
         editClockOut.setOnClickListener(v -> showTimePicker(editClockOut));
 
@@ -185,10 +216,9 @@ public class ReviewDetailActivity extends AppCompatActivity {
         int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
         int minute = mcurrentTime.get(Calendar.MINUTE);
         
-        TimePickerDialog mTimePicker;
-        mTimePicker = new TimePickerDialog(this, (timePicker, selectedHour, selectedMinute) -> {
+        TimePickerDialog mTimePicker = new TimePickerDialog(this, (timePicker, selectedHour, selectedMinute) -> {
             targetField.setText(String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute));
-        }, hour, minute, true); // true for 24 hour time
+        }, hour, minute, true);
         mTimePicker.setTitle("Select Time");
         mTimePicker.show();
     }
@@ -197,7 +227,6 @@ public class ReviewDetailActivity extends AppCompatActivity {
         try {
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
             
-            // Update Start Time
             if (shiftStartTimestamp != null) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(shiftStartTimestamp.toDate());
@@ -209,7 +238,6 @@ public class ReviewDetailActivity extends AppCompatActivity {
                 shiftStartTimestamp = new Timestamp(cal.getTime());
             }
 
-            // Update End Time
             if (shiftEndTimestamp != null) {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(shiftEndTimestamp.toDate());

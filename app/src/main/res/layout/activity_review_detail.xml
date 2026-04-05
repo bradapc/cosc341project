@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light">
@@ -10,13 +11,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Header -->
+        <!-- Header - Increased margin for camera hole punch consistency -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="20dp"
             android:background="@color/white"
-            android:elevation="4dp">
+            android:elevation="4dp"
+            android:layout_marginTop="48dp">
 
             <TextView
                 android:id="@+id/headerWorkerName"
@@ -146,6 +148,53 @@
                             app:strokeColor="@color/text_secondary"
                             app:strokeWidth="1dp"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- MANAGER REVIEW: Estimated Earnings Section -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/reviewEarningsCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    android:layout_marginBottom="32dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp"
+                        android:background="#E8F5E9">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="WORKER ESTIMATED EARNINGS"
+                            android:textSize="12sp"
+                            android:textColor="@color/primary_green"
+                            android:letterSpacing="0.1"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="12dp"/>
+
+                        <TextView
+                            android:id="@+id/reviewEstimatedEarnings"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="$0.00"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_green"
+                            android:layout_marginBottom="4dp"/>
+
+                        <TextView
+                            android:id="@+id/reviewEarningsBreakdown"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Hourly: $0.00 | Bins: $0.00"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"/>
+
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 

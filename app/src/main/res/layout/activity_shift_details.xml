@@ -1,150 +1,254 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
     android:background="@color/background_light"
     tools:context=".ShiftDetailsActivity">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SHIFT DETAILS"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/text_main"
-        android:gravity="center"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="32dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        android:layout_marginBottom="24dp">
-
-        <LinearLayout
+        <!-- Header - Moved down for camera hole punch -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp">
-
-            <TextView
-                android:id="@+id/detailWorkerName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Worker: --"
-                android:textSize="18sp"
-                android:textColor="@color/text_main"
-                android:layout_marginBottom="16dp"/>
-
-            <TextView
-                android:id="@+id/detailZone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Assigned Zone: --"
-                android:textSize="16sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="16dp"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"
-                android:layout_marginBottom="16dp"/>
-
-            <TextView
-                android:id="@+id/detailStartTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Start Time: --"
-                android:textSize="16sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="8dp"/>
-
-            <TextView
-                android:id="@+id/detailEndTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="End Time: --"
-                android:textSize="16sp"
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="16dp"/>
-
-            <TextView
-                android:id="@+id/detailDuration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Total Time on Shift: --"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary_green"/>
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Earnings Breakdown (Only visible when not clocked in) -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/detailEarningsCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        android:layout_marginBottom="32dp"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:padding="20dp"
-            android:background="#E8F5E9">
+            android:background="@color/white"
+            android:elevation="4dp"
+            android:layout_marginTop="32dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SESSION EARNINGS"
-                android:textSize="12sp"
+                android:text="SHIFT DETAILS"
                 android:textColor="@color/primary_green"
-                android:letterSpacing="0.1"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="12dp"/>
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
 
-            <TextView
-                android:id="@+id/detailEstimatedEarnings"
-                android:layout_width="wrap_content"
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="$0.00"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary_green"
-                android:layout_marginBottom="4dp"/>
+                android:orientation="vertical"
+                android:padding="24dp">
 
-            <TextView
-                android:id="@+id/detailEarningsBreakdown"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hourly: $0.00 | Bins: $0.00"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"/>
+                <!-- Worker Info Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    android:layout_marginBottom="24dp">
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="24dp">
 
-    <Button
-        android:id="@+id/backToEarningsButton"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="BACK TO EARNINGS"
-        android:backgroundTint="@color/white"
-        android:textColor="@color/text_secondary"
-        app:cornerRadius="12dp"
-        app:strokeColor="@color/text_secondary"
-        app:strokeWidth="1dp"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                        <TextView
+                            android:id="@+id/detailWorkerName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Worker: --"
+                            android:textSize="18sp"
+                            android:textColor="@color/text_main"
+                            android:layout_marginBottom="16dp"/>
 
-</LinearLayout>
+                        <TextView
+                            android:id="@+id/detailZone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Assigned Zone: --"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="16dp"/>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="#EEEEEE"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView
+                            android:id="@+id/detailStartTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Start Time: --"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:id="@+id/detailEndTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="End Time: --"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView
+                            android:id="@+id/detailDuration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total Time on Shift: --"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_green"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Harvest Breakdown -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/detailHarvestCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    android:layout_marginBottom="24dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="HARVEST PRODUCTION"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:letterSpacing="0.1"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="16dp"/>
+
+                        <TextView
+                            android:id="@+id/detailHarvestBreakdownText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Loading breakdown..."
+                            android:textColor="@color/text_main"
+                            android:textSize="14sp"
+                            android:lineSpacingExtra="4dp"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Manager Adjustments Section -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/managerNotesCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    android:layout_marginBottom="24dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp"
+                        android:background="#FFF3E0">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="MANAGER ADJUSTMENTS"
+                            android:textSize="12sp"
+                            android:textColor="@color/accent_orange"
+                            android:letterSpacing="0.1"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="12dp"/>
+
+                        <TextView
+                            android:id="@+id/managerNotesText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No notes provided."
+                            android:textSize="14sp"
+                            android:textColor="@color/text_main"
+                            android:textStyle="italic"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Earnings Breakdown -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/detailEarningsCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    android:layout_marginBottom="32dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp"
+                        android:background="#E8F5E9">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ESTIMATED EARNINGS"
+                            android:textSize="12sp"
+                            android:textColor="@color/primary_green"
+                            android:letterSpacing="0.1"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="12dp"/>
+
+                        <TextView
+                            android:id="@+id/detailEstimatedEarnings"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="$0.00"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_green"
+                            android:layout_marginBottom="4dp"/>
+
+                        <TextView
+                            android:id="@+id/detailEarningsBreakdown"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Hourly: $0.00 | Bins: $0.00"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/backToEarningsButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="16dp"
+            android:text="BACK TO EARNINGS"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/text_secondary"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/text_secondary"
+            app:strokeWidth="1dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+    </LinearLayout>
+
+</RelativeLayout>

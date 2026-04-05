@@ -23,13 +23,13 @@ import java.util.Map;
 public class ShiftDetailsActivity extends AppCompatActivity {
 
     private TextView detailWorkerName, detailZone, detailStartTime, detailEndTime, detailDuration;
-    private TextView detailEstimatedEarnings, detailEarningsBreakdown;
-    private View detailEarningsCard;
+    private TextView detailEstimatedEarnings, detailEarningsBreakdown, detailHarvestBreakdownText;
+    private TextView managerNotesText;
+    private View detailEarningsCard, managerNotesCard;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private double hourlyRate = 19.0;
 
-    // Adjusted bin rates to match EarningsActivity bonuses (max ~$7)
     private final Map<String, Double> binRates = new HashMap<String, Double>() {{
         put("Apples", 3.50);
         put("Pears", 4.00);
@@ -51,6 +51,10 @@ public class ShiftDetailsActivity extends AppCompatActivity {
         detailStartTime = findViewById(R.id.detailStartTime);
         detailEndTime = findViewById(R.id.detailEndTime);
         detailDuration = findViewById(R.id.detailDuration);
+        detailHarvestBreakdownText = findViewById(R.id.detailHarvestBreakdownText);
+        
+        managerNotesCard = findViewById(R.id.managerNotesCard);
+        managerNotesText = findViewById(R.id.managerNotesText);
         
         detailEarningsCard = findViewById(R.id.detailEarningsCard);
         detailEstimatedEarnings = findViewById(R.id.detailEstimatedEarnings);
@@ -111,6 +115,7 @@ public class ShiftDetailsActivity extends AppCompatActivity {
         String zone = doc.getString("zone");
         String shiftId = doc.getId();
         boolean isActive = doc.getBoolean("active") != null && doc.getBoolean("active");
+        String managerNotes = doc.getString("managerNotes");
 
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.getDefault());
         detailStartTime.setText("Start Time: " + (start != null ? sdf.format(start.toDate()) : "--"));
@@ -119,10 +124,20 @@ public class ShiftDetailsActivity extends AppCompatActivity {
         if (isActive || end == null) {
             detailEndTime.setText("End Time: Active Now");
             detailEarningsCard.setVisibility(View.GONE);
+            managerNotesCard.setVisibility(View.GONE);
         } else {
             detailEndTime.setText("End Time: " + sdf.format(end.toDate()));
             detailEarningsCard.setVisibility(View.VISIBLE);
-            calculateSessionEarnings(shiftId, start, end);
+            
+            // Show manager notes if they exist
+            if (managerNotes != null && !managerNotes.isEmpty()) {
+                managerNotesCard.setVisibility(View.VISIBLE);
+                managerNotesText.setText(managerNotes);
+            } else {
+                managerNotesCard.setVisibility(View.GONE);
+            }
+            
+            calculateSessionEarnings(shiftId, start, end, doc);
         }
 
         if (start != null) {
@@ -134,19 +149,39 @@ public class ShiftDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private void calculateSessionEarnings(String shiftId, Timestamp start, Timestamp end) {
+    private void calculateSessionEarnings(String shiftId, Timestamp start, Timestamp end, QueryDocumentSnapshot shiftDoc) {
         db.collection("harvest_logs")
                 .whereEqualTo("shiftId", shiftId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     double binPay = 0;
+                    Map<String, Integer> breakdown = new HashMap<>();
+                    int totalBins = 0;
+                    
                     for (QueryDocumentSnapshot logDoc : queryDocumentSnapshots) {
                         String crop = logDoc.getString("cropType");
                         Long bins = logDoc.getLong("binCount");
-                        if (bins != null) {
-                            binPay += bins.intValue() * binRates.getOrDefault(crop, 3.0);
+                        if (bins != null && crop != null) {
+                            int count = bins.intValue();
+                            totalBins += count;
+                            breakdown.put(crop, breakdown.getOrDefault(crop, 0) + count);
+                            binPay += count * binRates.getOrDefault(crop, 3.0);
                         }
                     }
+
+                    // Check for manual manager override of bin totals
+                    Long manualBins = shiftDoc.getLong("manualBinCount");
+                    if (manualBins != null) {
+                        // If manager overrode the total, we use that for pay but note it
+                        // Simplified for prototype: we keep the breakdown as logged, 
+                        // but you could add a "Correction" line here.
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    for (Map.Entry<String, Integer> entry : breakdown.entrySet()) {
+                        sb.append(entry.getKey()).append(": ").append(entry.getValue()).append(" Bins\n");
+                    }
+                    detailHarvestBreakdownText.setText(sb.length() > 0 ? sb.toString().trim() : "No bins logged.");
 
                     long diff = end.toDate().getTime() - start.toDate().getTime();
                     double hours = diff / (1000.0 * 60.0 * 60.0);
