@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_work"
+        android:icon="@android:drawable/ic_menu_today"
+        android:title="Work" />
+    <item
+        android:id="@+id/nav_harvest"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Harvest" />
+    <item
+        android:id="@+id/nav_earnings"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="Earnings" />
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:title="Dashboard" />
+    <item
+        android:id="@+id/nav_review"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Review" />
+</menu>

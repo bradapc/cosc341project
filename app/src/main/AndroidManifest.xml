@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Orchard">
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,8 +20,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".RegisterActivity" android:exported="false" />
         <activity android:name=".ClockInActivity" android:exported="false" />
         <activity android:name=".ClockInSuccessActivity" android:exported="false" />
+        <activity android:name=".ClockOutActivity" android:exported="false" />
+        <activity android:name=".ClockOutSuccessActivity" android:exported="false" />
+        <activity android:name=".HarvestActivity" android:exported="false" />
+        <activity android:name=".EarningsActivity" android:exported="false" />
+        <activity android:name=".DashboardActivity" android:exported="false" />
+        <activity android:name=".ReviewActivity" android:exported="false" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
     </application>
 
 </manifest>

@@ -9,7 +9,7 @@
     android:padding="24dp"
     android:background="@color/background_light"
     android:gravity="center"
-    tools:context=".ClockInSuccessActivity"
+    tools:context=".ClockOutSuccessActivity"
     tools:ignore="HardcodedText">
 
     <androidx.cardview.widget.CardView
@@ -29,7 +29,7 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 app:cardCornerRadius="40dp"
-                app:cardBackgroundColor="@color/status_clocked_in"
+                app:cardBackgroundColor="@color/accent_orange"
                 app:cardElevation="0dp"
                 android:layout_marginBottom="24dp">
                 <TextView
@@ -44,7 +44,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Success!"
+                android:text="Clocked Out"
                 android:textSize="28sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_main"
@@ -53,7 +53,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="You are now clocked in."
+                android:text="Your shift has been recorded."
                 android:textSize="16sp"
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="16dp" />
@@ -73,6 +73,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Worker: --"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/shiftDurationText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Duration: --"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/totalBinsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Bins: --"
                 android:textSize="16sp"
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="32dp"/>

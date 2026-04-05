@@ -2,6 +2,8 @@ package com.example.orchard;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.TypedValue;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -11,11 +13,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class ClockInSuccessActivity extends AppCompatActivity {
+
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +31,13 @@ public class ClockInSuccessActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_clock_in_success);
 
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
+            v.setPadding(systemBars.left + padding, systemBars.top + padding, systemBars.right + padding, systemBars.bottom + padding);
             return insets;
         });
 
@@ -33,6 +45,9 @@ public class ClockInSuccessActivity extends AppCompatActivity {
         TextView successTimeText = findViewById(R.id.successTimeText);
         String currentTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(new Date());
         successTimeText.setText("Time: " + currentTime);
+
+        TextView workerNameText = findViewById(R.id.workerNameText);
+        loadUserName(workerNameText);
 
         Button returnDashboardButton = findViewById(R.id.returnDashboardButton);
 
@@ -43,5 +58,18 @@ public class ClockInSuccessActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         });
+    }
+
+    private void loadUserName(TextView textView) {
+        if (mAuth.getCurrentUser() == null) return;
+        String userId = mAuth.getCurrentUser().getUid();
+        db.collection("users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String name = documentSnapshot.getString("name");
+                        textView.setText("Worker: " + (name != null ? name : "Unknown"));
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("ClockInSuccess", "Error loading name", e));
     }
 }

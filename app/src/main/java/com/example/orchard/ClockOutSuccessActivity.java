@@ -6,7 +6,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,7 +13,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -22,19 +20,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class ClockInActivity extends AppCompatActivity {
+public class ClockOutSuccessActivity extends AppCompatActivity {
 
-    private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_clock_in);
+        setContentView(R.layout.activity_clock_out_success);
 
-        db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -43,20 +41,30 @@ public class ClockInActivity extends AppCompatActivity {
             return insets;
         });
 
-        TextView timeText = findViewById(R.id.timeText);
+        TextView successTimeText = findViewById(R.id.successTimeText);
         String currentTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(new Date());
-        timeText.setText(currentTime);
+        successTimeText.setText("Time: " + currentTime);
 
         TextView workerNameText = findViewById(R.id.workerNameText);
         loadUserName(workerNameText);
 
-        Button confirmClockInButton = findViewById(R.id.confirmClockInButton);
-        Button cancelButton = findViewById(R.id.cancelButton);
+        // Receive the shift details from the intent
+        String duration = getIntent().getStringExtra("duration");
+        int totalBins = getIntent().getIntExtra("totalBins", 0);
 
-        cancelButton.setOnClickListener(v -> finish());
+        TextView shiftDurationText = findViewById(R.id.shiftDurationText);
+        TextView totalBinsText = findViewById(R.id.totalBinsText);
 
-        confirmClockInButton.setOnClickListener(v -> {
-            clockInUser();
+        if (duration != null) {
+            shiftDurationText.setText("Duration: " + duration);
+        }
+        totalBinsText.setText("Total Bins: " + totalBins);
+
+        Button returnDashboardButton = findViewById(R.id.returnDashboardButton);
+        returnDashboardButton.setOnClickListener(v -> {
+            Intent intent = new Intent(ClockOutSuccessActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
         });
     }
 
@@ -67,27 +75,9 @@ public class ClockInActivity extends AppCompatActivity {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String name = documentSnapshot.getString("name");
-                        textView.setText(name != null ? name : "Unknown");
+                        textView.setText("Worker: " + (name != null ? name : "Unknown"));
                     }
                 })
-                .addOnFailureListener(e -> Log.e("ClockInActivity", "Error loading name", e));
-    }
-
-    private void clockInUser() {
-        if (mAuth.getCurrentUser() == null) return;
-
-        String userId = mAuth.getCurrentUser().getUid();
-        Shift newShift = new Shift(userId, Timestamp.now());
-
-        db.collection("shifts")
-            .add(newShift)
-            .addOnSuccessListener(documentReference -> {
-                Intent intent = new Intent(ClockInActivity.this, ClockInSuccessActivity.class);
-                startActivity(intent);
-                finish();
-            })
-            .addOnFailureListener(e -> {
-                Toast.makeText(this, "Error clocking in: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            });
+                .addOnFailureListener(e -> Log.e("ClockOutSuccess", "Error loading name", e));
     }
 }

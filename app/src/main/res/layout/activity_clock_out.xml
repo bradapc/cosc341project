@@ -9,7 +9,7 @@
     android:padding="24dp"
     android:background="@color/background_light"
     android:gravity="center_vertical"
-    tools:context=".ClockInActivity"
+    tools:context=".ClockOutActivity"
     tools:ignore="HardcodedText">
 
     <androidx.cardview.widget.CardView
@@ -36,7 +36,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ready to Clock In?"
+                android:text="Ready to Clock Out?"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_main"
@@ -81,7 +81,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="Fahar Murray"
+                        android:text="--"
                         android:textStyle="bold"
                         android:textColor="@color/text_main"/>
                 </RelativeLayout>
@@ -105,13 +105,13 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/confirmClockInButton"
+                android:id="@+id/confirmClockOutButton"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="Clock In"
+                android:text="Clock Out"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:backgroundTint="@color/primary_green"
+                android:backgroundTint="@color/accent_orange"
                 android:textColor="@color/white"
                 app:cornerRadius="12dp"
                 android:layout_marginBottom="12dp"/>

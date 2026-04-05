@@ -2,4 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <color name="primary_green">#2E7D32</color>
+    <color name="primary_light">#60AD5E</color>
+    <color name="primary_dark">#005005</color>
+    
+    <color name="accent_orange">#F57C00</color>
+    
+    <color name="background_light">#F5F5F5</color>
+    <color name="text_main">#212121</color>
+    <color name="text_secondary">#757575</color>
+    
+    <color name="status_not_clocked">#9E9E9E</color>
+    <color name="status_clocked_in">#43A047</color>
 </resources>
