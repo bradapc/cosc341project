@@ -1,6 +1,8 @@
 package com.example.orchard;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -17,6 +19,7 @@ import com.google.android.gms.maps.model.PolygonOptions;
 public class ZoneDistributionActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private final LatLng correctOrchardCenter = new LatLng(50.2655, -119.2709);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +30,26 @@ public class ZoneDistributionActivity extends AppCompatActivity implements OnMap
         findViewById(R.id.backButton).setOnClickListener(v -> finish());
         findViewById(R.id.homeButton).setOnClickListener(v -> finish());
 
+        findViewById(R.id.viewMapButton).setOnClickListener(v -> openExternalMap());
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
+        }
+    }
+
+    private void openExternalMap() {
+        Uri gmmIntentUri = Uri.parse("geo:" + correctOrchardCenter.latitude + "," + correctOrchardCenter.longitude + "?z=17&q=" + correctOrchardCenter.latitude + "," + correctOrchardCenter.longitude + "(Apple+Orchard)");
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        } else {
+            if (mMap != null) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(correctOrchardCenter, 17f));
+            }
         }
     }
 
@@ -39,9 +58,6 @@ public class ZoneDistributionActivity extends AppCompatActivity implements OnMap
         mMap = googleMap;
 
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-
-        // TODO: replace with orchard coordinates
-        LatLng orchardCenter = new LatLng(50.2654, -119.2711);
 
         PolygonOptions blockA = new PolygonOptions()
                 .add(new LatLng(50.2660, -119.2720),
@@ -63,6 +79,6 @@ public class ZoneDistributionActivity extends AppCompatActivity implements OnMap
                 .strokeWidth(5);
         mMap.addPolygon(blockB);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(orchardCenter, 16f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(correctOrchardCenter, 16f));
     }
 }
