@@ -31,6 +31,7 @@ public class ClockOutActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private String currentShiftId;
     private Timestamp startTime;
+    private String assignedZone = "Apple Orchard - Row B"; // Default fallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +55,9 @@ public class ClockOutActivity extends AppCompatActivity {
         timeText.setText(currentTime);
 
         TextView workerNameText = findViewById(R.id.workerNameText);
-        loadUserName(workerNameText);
+        TextView zoneNameText = findViewById(R.id.zoneNameText);
+        
+        loadUserData(workerNameText, zoneNameText);
         loadShiftData();
 
         Button confirmClockOutButton = findViewById(R.id.confirmClockOutButton);
@@ -67,17 +70,28 @@ public class ClockOutActivity extends AppCompatActivity {
         });
     }
 
-    private void loadUserName(TextView textView) {
+    private void loadUserData(TextView nameView, TextView zoneView) {
         if (mAuth.getCurrentUser() == null) return;
         String userId = mAuth.getCurrentUser().getUid();
         db.collection("users").document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String name = documentSnapshot.getString("name");
-                        textView.setText(name != null ? name : "Unknown");
+                        String zone = documentSnapshot.getString("assignedZone");
+                        
+                        nameView.setText(name != null ? name : "Unknown");
+                        if (zone != null) {
+                            assignedZone = zone;
+                            zoneView.setText(zone);
+                        } else {
+                            zoneView.setText(assignedZone);
+                        }
                     }
                 })
-                .addOnFailureListener(e -> Log.e("ClockOutActivity", "Error loading name", e));
+                .addOnFailureListener(e -> {
+                    Log.e("ClockOutActivity", "Error loading user data", e);
+                    Toast.makeText(this, "Connection error. Displaying local defaults.", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void loadShiftData() {
@@ -107,7 +121,8 @@ public class ClockOutActivity extends AppCompatActivity {
                     fetchHarvestStatsAndFinish(endTime);
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error clocking out: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.e("ClockOutActivity", "Error updating shift", e);
+                    Toast.makeText(this, "Unable to reach database. Please check your connection.", Toast.LENGTH_LONG).show();
                 });
     }
 
@@ -129,6 +144,14 @@ public class ClockOutActivity extends AppCompatActivity {
                     intent.putExtra("totalBins", totalBins);
                     startActivity(intent);
                     finish();
+                })
+                .addOnFailureListener(e -> {
+                    // Even if logs fail, we should still finish the clock out process
+                    Intent intent = new Intent(ClockOutActivity.this, ClockOutSuccessActivity.class);
+                    intent.putExtra("duration", calculateDuration(startTime, endTime));
+                    intent.putExtra("totalBins", 0);
+                    startActivity(intent);
+                    finish();
                 });
     }
 
@@ -136,7 +159,7 @@ public class ClockOutActivity extends AppCompatActivity {
         if (start == null || end == null) return "0h 0m";
         long diff = end.toDate().getTime() - start.toDate().getTime();
         long hours = diff / (60 * 60 * 1000);
-        long minutes = (diff / (60 * 1000)) % 60;
+        long minutes = (diff / (1000 * 60)) % 60;
         return hours + "h " + minutes + "m";
     }
 }

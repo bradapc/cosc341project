@@ -26,6 +26,7 @@ public class ClockInActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private String assignedZone = "Apple Orchard - Row B"; // Default fallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +49,9 @@ public class ClockInActivity extends AppCompatActivity {
         timeText.setText(currentTime);
 
         TextView workerNameText = findViewById(R.id.workerNameText);
-        loadUserName(workerNameText);
+        TextView zoneNameText = findViewById(R.id.zoneNameText);
+        
+        loadUserData(workerNameText, zoneNameText);
 
         Button confirmClockInButton = findViewById(R.id.confirmClockInButton);
         Button cancelButton = findViewById(R.id.cancelButton);
@@ -60,25 +63,35 @@ public class ClockInActivity extends AppCompatActivity {
         });
     }
 
-    private void loadUserName(TextView textView) {
+    private void loadUserData(TextView nameView, TextView zoneView) {
         if (mAuth.getCurrentUser() == null) return;
         String userId = mAuth.getCurrentUser().getUid();
         db.collection("users").document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String name = documentSnapshot.getString("name");
-                        textView.setText(name != null ? name : "Unknown");
+                        String zone = documentSnapshot.getString("assignedZone");
+                        
+                        nameView.setText(name != null ? name : "Unknown");
+                        if (zone != null) {
+                            assignedZone = zone;
+                            zoneView.setText(zone);
+                        } else {
+                            zoneView.setText(assignedZone);
+                        }
                     }
                 })
-                .addOnFailureListener(e -> Log.e("ClockInActivity", "Error loading name", e));
+                .addOnFailureListener(e -> {
+                    Log.e("ClockInActivity", "Error loading user data", e);
+                    Toast.makeText(this, "Connection error. Using offline defaults.", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void clockInUser() {
         if (mAuth.getCurrentUser() == null) return;
 
         String userId = mAuth.getCurrentUser().getUid();
-        // Updated to match the Shift constructor (userId, startTime, zone)
-        Shift newShift = new Shift(userId, Timestamp.now(), "Apple Orchard - Row B");
+        Shift newShift = new Shift(userId, Timestamp.now(), assignedZone);
 
         db.collection("shifts")
             .add(newShift)
@@ -88,7 +101,7 @@ public class ClockInActivity extends AppCompatActivity {
                 finish();
             })
             .addOnFailureListener(e -> {
-                Toast.makeText(this, "Error clocking in: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Unable to reach database. Please check your connection.", Toast.LENGTH_LONG).show();
             });
     }
 }

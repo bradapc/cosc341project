@@ -19,7 +19,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    private EditText nameEditText, emailEditText, passwordEditText;
+    private EditText nameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +32,7 @@ public class RegisterActivity extends AppCompatActivity {
         nameEditText = findViewById(R.id.registerNameEditText);
         emailEditText = findViewById(R.id.registerEmailEditText);
         passwordEditText = findViewById(R.id.registerPasswordEditText);
+        confirmPasswordEditText = findViewById(R.id.registerConfirmPasswordEditText);
         Button registerButton = findViewById(R.id.registerButton);
         TextView backToLogin = findViewById(R.id.backToLoginTextView);
 
@@ -39,9 +40,25 @@ public class RegisterActivity extends AppCompatActivity {
             String name = nameEditText.getText().toString().trim();
             String email = emailEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
+            String confirmPassword = confirmPasswordEditText.getText().toString().trim();
 
-            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            if (name.isEmpty()) {
+                nameEditText.setError("Full name is required");
+                return;
+            }
+
+            if (email.isEmpty()) {
+                emailEditText.setError("Email is required");
+                return;
+            }
+
+            if (password.length() < 6) {
+                passwordEditText.setError("Password must be at least 6 characters");
+                return;
+            }
+
+            if (!password.equals(confirmPassword)) {
+                confirmPasswordEditText.setError("Passwords do not match");
                 return;
             }
 
@@ -49,7 +66,6 @@ public class RegisterActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         String userId = mAuth.getCurrentUser().getUid();
-                        // All users are registered as "worker" by default
                         saveUserToFirestore(userId, name, email, "worker");
                     } else {
                         Toast.makeText(RegisterActivity.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
@@ -65,6 +81,8 @@ public class RegisterActivity extends AppCompatActivity {
         user.put("name", name);
         user.put("email", email);
         user.put("role", role);
+        // Added a default zone assignment upon registration
+        user.put("assignedZone", "Apple Orchard - Row B");
 
         db.collection("users").document(userId)
             .set(user)

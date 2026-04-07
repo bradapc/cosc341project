@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -32,7 +31,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView statusText, shiftDurationText, binsHarvestedText, greetingText;
+    private TextView statusText, shiftDurationText, binsHarvestedText, greetingText, mainZoneText;
     private TextView totalFarmBinsText, activeWorkersCountText, cropBreakdownText;
     private Button clockInButton, mainLogHarvestButton;
     private View activeShiftCard, workerStatusCard, managerOverviewCard, managerQuickActions, managerCropsCard, scheduleCard;
@@ -82,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         clockInButton = findViewById(R.id.clockInButton);
         mainLogHarvestButton = findViewById(R.id.mainLogHarvestButton);
         greetingText = findViewById(R.id.greetingText);
+        mainZoneText = findViewById(R.id.mainZoneText);
         activeShiftCard = findViewById(R.id.activeShiftCard);
         workerStatusCard = findViewById(R.id.workerStatusCard);
         managerOverviewCard = findViewById(R.id.managerOverviewCard);
@@ -96,7 +96,8 @@ public class MainActivity extends AppCompatActivity {
         shiftDurationText = findViewById(R.id.shiftDurationText);
         binsHarvestedText = findViewById(R.id.binsHarvestedText);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        ImageButton profileButton = findViewById(R.id.profileButton);
+
+        View profileButton = findViewById(R.id.profileButton);
 
         profileButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, ProfileActivity.class)));
         mainLogHarvestButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, HarvestActivity.class)));
@@ -136,7 +137,10 @@ public class MainActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         String name = documentSnapshot.getString("name");
                         userRole = documentSnapshot.getString("role");
+                        String zone = documentSnapshot.getString("assignedZone");
+                        
                         if (name != null && !name.isEmpty()) greetingText.setText("Welcome, " + name);
+                        if (zone != null && !zone.isEmpty()) mainZoneText.setText(zone);
                         
                         updateRoleUI();
                     }
@@ -252,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
         if (shiftStartTime == null) return;
         long diff = new Date().getTime() - shiftStartTime.toDate().getTime();
         long hours = diff / (60 * 60 * 1000);
-        long minutes = (diff / (60 * 1000)) % 60;
+        long minutes = (diff / (1000 * 60)) % 60;
         shiftDurationText.setText(hours + "h " + minutes + "m");
     }
 

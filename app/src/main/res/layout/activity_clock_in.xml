@@ -81,7 +81,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="Fahar Murray"
+                        android:text="Loading..."
+                        tools:text="Worker Name"
                         android:textStyle="bold"
                         android:textColor="@color/text_main"/>
                 </RelativeLayout>
@@ -95,10 +96,12 @@
                         android:text="Zone"
                         android:textColor="@color/text_secondary"/>
                     <TextView
+                        android:id="@+id/zoneNameText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="Apple Orchard - Row B"
+                        android:text="Loading..."
+                        tools:text="Apple Orchard - Row B"
                         android:textStyle="bold"
                         android:textColor="@color/text_main"/>
                 </RelativeLayout>

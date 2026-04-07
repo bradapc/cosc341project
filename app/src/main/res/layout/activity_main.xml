@@ -14,11 +14,11 @@
         android:layout_above="@+id/bottom_navigation"
         android:orientation="vertical">
 
-        <!-- Header -->
+        <!-- Header with Labeled Profile Button -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
+            android:padding="16dp"
             android:background="@color/white"
             android:elevation="4dp">
 
@@ -31,15 +31,35 @@
                 android:textStyle="bold"
                 android:layout_centerVertical="true"/>
 
-            <ImageButton
+            <LinearLayout
                 android:id="@+id/profileButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_info_details"
-                app:tint="@color/text_secondary"
-                android:contentDescription="Profile" />
+                android:layout_centerVertical="true"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PROFILE"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginEnd="8dp"/>
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_person"
+                    app:tint="@color/text_secondary"
+                    android:contentDescription="User Profile and Logout" />
+            </LinearLayout>
         </RelativeLayout>
 
         <ScrollView
@@ -370,6 +390,7 @@
                                 android:text="Shift"
                                 android:textColor="@color/text_secondary"/>
                             <TextView
+                                android:id="@+id/mainShiftTimeText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
@@ -387,10 +408,12 @@
                                 android:text="Zone"
                                 android:textColor="@color/text_secondary"/>
                             <TextView
+                                android:id="@+id/mainZoneText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
-                                android:text="Apple Orchard - Row B"
+                                android:text="Loading..."
+                                tools:text="Apple Orchard - Row B"
                                 android:textStyle="bold"
                                 android:textColor="@color/text_main"/>
                         </RelativeLayout>

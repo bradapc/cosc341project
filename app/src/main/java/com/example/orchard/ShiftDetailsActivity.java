@@ -104,6 +104,8 @@ public class ShiftDetailsActivity extends AppCompatActivity {
 
                     if (latestShift != null) {
                         displayShiftData(latestShift);
+                    } else {
+                        detailHarvestBreakdownText.setText("No shifts found.");
                     }
                 })
                 .addOnFailureListener(e -> Log.e("ShiftDetails", "Error loading shifts", e));
@@ -129,16 +131,16 @@ public class ShiftDetailsActivity extends AppCompatActivity {
             detailEndTime.setText("End Time: " + sdf.format(end.toDate()));
             detailEarningsCard.setVisibility(View.VISIBLE);
             
-            // Show manager notes if they exist
             if (managerNotes != null && !managerNotes.isEmpty()) {
                 managerNotesCard.setVisibility(View.VISIBLE);
                 managerNotesText.setText(managerNotes);
             } else {
                 managerNotesCard.setVisibility(View.GONE);
             }
-            
-            calculateSessionEarnings(shiftId, start, end, doc);
         }
+
+        // Always calculate/load harvest production regardless of active status
+        calculateSessionEarnings(shiftId, start, end, doc);
 
         if (start != null) {
             long endTimeMillis = (end != null) ? end.toDate().getTime() : new Date().getTime();
@@ -156,39 +158,32 @@ public class ShiftDetailsActivity extends AppCompatActivity {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     double binPay = 0;
                     Map<String, Integer> breakdown = new HashMap<>();
-                    int totalBins = 0;
                     
                     for (QueryDocumentSnapshot logDoc : queryDocumentSnapshots) {
                         String crop = logDoc.getString("cropType");
                         Long bins = logDoc.getLong("binCount");
                         if (bins != null && crop != null) {
                             int count = bins.intValue();
-                            totalBins += count;
                             breakdown.put(crop, breakdown.getOrDefault(crop, 0) + count);
                             binPay += count * binRates.getOrDefault(crop, 3.0);
                         }
-                    }
-
-                    // Check for manual manager override of bin totals
-                    Long manualBins = shiftDoc.getLong("manualBinCount");
-                    if (manualBins != null) {
-                        // If manager overrode the total, we use that for pay but note it
-                        // Simplified for prototype: we keep the breakdown as logged, 
-                        // but you could add a "Correction" line here.
                     }
 
                     StringBuilder sb = new StringBuilder();
                     for (Map.Entry<String, Integer> entry : breakdown.entrySet()) {
                         sb.append(entry.getKey()).append(": ").append(entry.getValue()).append(" Bins\n");
                     }
-                    detailHarvestBreakdownText.setText(sb.length() > 0 ? sb.toString().trim() : "No bins logged.");
+                    detailHarvestBreakdownText.setText(sb.length() > 0 ? sb.toString().trim() : "No bins logged for this shift.");
 
-                    long diff = end.toDate().getTime() - start.toDate().getTime();
-                    double hours = diff / (1000.0 * 60.0 * 60.0);
-                    double hourlyPay = hours * hourlyRate;
-                    double totalPay = hourlyPay + binPay;
-
-                    updateSessionEarningsUI(totalPay, hourlyPay, binPay);
+                    // Only update earnings UI if shift is completed (as per previous logic)
+                    boolean isActive = shiftDoc.getBoolean("active") != null && shiftDoc.getBoolean("active");
+                    if (!isActive && start != null && end != null) {
+                        long diff = end.toDate().getTime() - start.toDate().getTime();
+                        double hours = diff / (1000.0 * 60.0 * 60.0);
+                        double hourlyPay = hours * hourlyRate;
+                        double totalPay = hourlyPay + binPay;
+                        updateSessionEarningsUI(totalPay, hourlyPay, binPay);
+                    }
                 });
     }
 
