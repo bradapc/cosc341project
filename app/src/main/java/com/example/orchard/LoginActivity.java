@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         Button loginButton = findViewById(R.id.loginButton);
         TextView registerText = findViewById(R.id.registerTextView);
+        TextView forgotPasswordText = findViewById(R.id.forgotPasswordTextView);
 
         loginButton.setOnClickListener(v -> {
             String email = emailEditText.getText().toString().trim();
@@ -58,8 +60,18 @@ public class LoginActivity extends AppCompatActivity {
                 });
         });
 
+        forgotPasswordText.setOnClickListener(v -> showForgotPasswordDialog());
+
         registerText.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         });
+    }
+
+    private void showForgotPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Forgot Password?");
+        builder.setMessage("Please contact your manager or supervisor to reset your account password. They can assist you with the manual reset process.");
+        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+        builder.show();
     }
 }
