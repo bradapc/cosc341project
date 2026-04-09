@@ -13,15 +13,6 @@
         android:background="@color/white"
         android:elevation="4dp">
 
-        <ImageButton
-            android:id="@+id/backButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_revert"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
-            android:layout_centerVertical="true"/>
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,7 +20,7 @@
             android:textColor="@color/primary_green"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_centerInParent="true"/>
+            android:layout_centerVertical="true"/>
     </RelativeLayout>
 
     <ScrollView
@@ -49,19 +40,8 @@
                 android:layout_marginBottom="24dp">
 
                 <Button
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="50dp"
-                    android:text="Filter"
-                    android:textColor="@color/text_main"
-                    android:backgroundTint="#E0E0E0"
-                    app:cornerRadius="8dp"
-                    android:layout_marginEnd="8dp"/>
-
-                <Button
                     android:id="@+id/viewMapButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1.5"
+                    android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:text="View Map"
                     android:textColor="@color/white"

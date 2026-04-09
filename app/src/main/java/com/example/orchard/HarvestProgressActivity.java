@@ -43,7 +43,6 @@ public class HarvestProgressActivity extends AppCompatActivity {
         blockSpinner.setAdapter(adapter);
 
         // buttons
-        findViewById(R.id.backButton).setOnClickListener(v -> finish());
         findViewById(R.id.homeButton).setOnClickListener(v -> finish());
 
         // quota for prototype
