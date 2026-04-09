@@ -19,9 +19,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -35,6 +37,7 @@ public class ReviewDetailActivity extends AppCompatActivity {
     private int currentTotalBins = 0;
     private long totalDurationMillis = 0;
     private Map<String, Integer> currentBreakdown = new HashMap<>();
+    private Map<String, List<String>> cropDocIds = new HashMap<>();
     private Timestamp shiftStartTimestamp, shiftEndTimestamp;
     private double hourlyRate = 19.0;
 
@@ -113,9 +116,10 @@ public class ReviewDetailActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(logs -> {
                     currentBreakdown.clear();
+                    cropDocIds.clear();
                     currentTotalBins = 0;
                     double totalBinPay = 0;
-                    
+
                     for (QueryDocumentSnapshot doc : logs) {
                         String crop = doc.getString("cropType");
                         Long bins = doc.getLong("binCount");
@@ -124,6 +128,8 @@ public class ReviewDetailActivity extends AppCompatActivity {
                             currentTotalBins += count;
                             currentBreakdown.put(crop, currentBreakdown.getOrDefault(crop, 0) + count);
                             totalBinPay += count * binRates.getOrDefault(crop, 3.0);
+                            if (!cropDocIds.containsKey(crop)) cropDocIds.put(crop, new ArrayList<>());
+                            cropDocIds.get(crop).add(doc.getId());
                         }
                     }
 
@@ -249,17 +255,26 @@ public class ReviewDetailActivity extends AppCompatActivity {
                 shiftEndTimestamp = new Timestamp(cal.getTime());
             }
 
-            int newTotal = 0;
-            for (EditText input : fruitInputs.values()) {
-                if (!input.getText().toString().isEmpty()) {
-                    newTotal += Integer.parseInt(input.getText().toString());
+            // Update harvest_logs for each edited crop
+            for (Map.Entry<String, EditText> entry : fruitInputs.entrySet()) {
+                String crop = entry.getKey();
+                String inputStr = entry.getValue().getText().toString();
+                int newCount = inputStr.isEmpty() ? 0 : Integer.parseInt(inputStr);
+                List<String> docIds = cropDocIds.get(crop);
+                if (docIds != null && !docIds.isEmpty()) {
+                    // Update the first document with the new total
+                    db.collection("harvest_logs").document(docIds.get(0))
+                            .update("binCount", newCount);
+                    // Delete any extra documents for this crop
+                    for (int i = 1; i < docIds.size(); i++) {
+                        db.collection("harvest_logs").document(docIds.get(i)).delete();
+                    }
                 }
             }
 
             Map<String, Object> updates = new HashMap<>();
             updates.put("startTime", shiftStartTimestamp);
             updates.put("endTime", shiftEndTimestamp);
-            updates.put("manualBinCount", newTotal);
             updates.put("managerNotes", notes);
             updates.put("approved", true);
             updates.put("verificationStatus", "Manager Verified");
