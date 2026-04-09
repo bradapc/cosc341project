@@ -1,5 +1,6 @@
 package com.example.orchard;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -24,10 +25,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -38,6 +41,10 @@ public class DashboardActivity extends AppCompatActivity {
 
     private TextView managerGreetingText, dashTotalBinsText, dashActiveWorkersText;
     private LinearLayout leaderboardContainer;
+    private Button dateFilterButton;
+
+    private Calendar selectedDate = Calendar.getInstance();
+    private SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +66,12 @@ public class DashboardActivity extends AppCompatActivity {
         dashActiveWorkersText = findViewById(R.id.dashActiveWorkersText);
         leaderboardContainer = findViewById(R.id.leaderboardContainer);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+        dateFilterButton = findViewById(R.id.dateFilterButton);
+
+        if (dateFilterButton != null) {
+            dateFilterButton.setOnClickListener(v -> showDatePicker());
+            updateDateButtonText();
+        }
 
         loadUserData();
 
@@ -100,6 +113,33 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
+    private void showDatePicker() {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) -> {
+                    selectedDate.set(Calendar.YEAR, year);
+                    selectedDate.set(Calendar.MONTH, month);
+                    selectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    updateDateButtonText();
+                    fetchDashboardMetrics();
+                },
+                selectedDate.get(Calendar.YEAR),
+                selectedDate.get(Calendar.MONTH),
+                selectedDate.get(Calendar.DAY_OF_MONTH)
+        );
+        datePickerDialog.show();
+    }
+
+    private void updateDateButtonText() {
+        Calendar today = Calendar.getInstance();
+        if (selectedDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                selectedDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
+            dateFilterButton.setText("Today");
+        } else {
+            dateFilterButton.setText(displayFormat.format(selectedDate.getTime()));
+        }
+    }
+
     private void loadUserData() {
         if (mAuth.getCurrentUser() == null) return;
         String userId = mAuth.getCurrentUser().getUid();
@@ -130,24 +170,42 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void fetchDashboardMetrics() {
-        // active worker count
-        db.collection("shifts")
-                .whereEqualTo("active", true)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    dashActiveWorkersText.setText(queryDocumentSnapshots.size() + " Crew");
-                });
-
-        // harvest logic for today (total bins & leaderboard)
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = (Calendar) selectedDate.clone();
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         Timestamp startOfDay = new Timestamp(cal.getTime());
 
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        Timestamp endOfDay = new Timestamp(cal.getTime());
+
+        Calendar today = Calendar.getInstance();
+        boolean isToday = selectedDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                selectedDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR);
+
+        // active worker count/shift count
+        if (isToday) {
+            db.collection("shifts")
+                    .whereEqualTo("active", true)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        dashActiveWorkersText.setText(queryDocumentSnapshots.size() + " Crew");
+                    });
+        } else {
+            db.collection("shifts")
+                    .whereGreaterThanOrEqualTo("startTime", startOfDay)
+                    .whereLessThan("startTime", endOfDay)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        dashActiveWorkersText.setText(queryDocumentSnapshots.size() + " Shifts");
+                    });
+        }
+
+        // harvest logic for selected date
         db.collection("harvest_logs")
                 .whereGreaterThanOrEqualTo("timestamp", startOfDay)
+                .whereLessThan("timestamp", endOfDay)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int totalBinsToday = 0;
@@ -176,7 +234,7 @@ public class DashboardActivity extends AppCompatActivity {
         if (userBinCounts.isEmpty()) {
             leaderboardContainer.removeAllViews();
             TextView emptyText = new TextView(this);
-            emptyText.setText("No harvest logs recorded today.");
+            emptyText.setText("No harvest logs recorded for this date.");
             emptyText.setTextColor(Color.parseColor("#757575"));
             emptyText.setPadding(16, 16, 16, 16);
             leaderboardContainer.addView(emptyText);

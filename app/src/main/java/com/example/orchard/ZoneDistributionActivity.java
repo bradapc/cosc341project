@@ -1,4 +1,3 @@
-// filepath: main/java/com/example/orchard/ZoneDistributionActivity.java
 package com.example.orchard;
 
 import android.content.Intent;
@@ -9,6 +8,9 @@ import android.os.Bundle;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,6 +29,12 @@ public class ZoneDistributionActivity extends AppCompatActivity implements OnMap
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_zone_distribution);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         findViewById(R.id.homeButton).setOnClickListener(v -> finish());
         findViewById(R.id.viewMapButton).setOnClickListener(v -> openExternalMap());
